@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    stages {
+        stage('Running python Script') {
+            steps {
+                sh 'python3 aws.py ${instance_id} ${instance_type}'
+            }
+           }
+            stage('Running Ansible Playbook') {
+              steps {
+                ansiblePlaybook become: true, credentialsId: 'ansible-playbook', disableHostKeyChecking: true, installation: 'ansible', inventory: 'hosts', playbook: 'install.yml'
+                }
+              }     
+        stage('Reverting the changes'){
+            steps{
+                sh 'python3 aws_reset.py'
+                }
+        
+        }
+       }
+     }
